@@ -44,6 +44,8 @@ webannotator.linksEnabled = true;
 webannotator.showEditEvent = null;
 
 webannotator.htmlWA = {
+    waPrefix: "WA_temp_",
+
     /**
      * First load of WA on the page. Called by onmouseover
      */
@@ -480,9 +482,7 @@ webannotator.htmlWA = {
         } else {
             doc = doc.getElementsByTagName("body")[0];
         }
-        var links = doc.getElementsByTagName("*");
-        var wa_prefix = "WA_temp_";
-        var i;
+
         // If an argument is defined
         if (value !== null) {
             // if activation is asked and already activated
@@ -493,129 +493,76 @@ webannotator.htmlWA = {
             }
             // else switch !
         }
-        // Enable -> Disable
+
         var _status;
         if (webannotator.linksEnabled) {
-            for(i = 0; i < links.length; i++) {
-                var toRemove = [];
-                var toPush = {};
-                var element = links[i];
-                var attrs = element.attributes;
-                var attrName; var length = attrs.length;
-                for (var attr, j = 0 ; j < length; j++){
-                    attr = attrs.item(j);
-                    attrName = attr.nodeName.toLowerCase();
-                    if ((element.nodeName.toLowerCase() === "a" && attrName.toLowerCase() === "href") || (attrName.startsWith("on")) || (attrName.startsWith("ajaxify"))) {
-                        toRemove.push(attrName);
-                        toPush[wa_prefix + attrName] = element.getAttribute(attrName);
-                    }
-                }
-                for (var elem in toRemove) {
-                    element.removeAttribute(toRemove[elem]);
-                }
-                for (var elem in toPush) {
-                    element.setAttribute(elem, toPush[elem]);
-                }
-            }
+            // Enable -> Disable
+            webannotator.htmlWA.disableLinksAndEvents(doc);
             _status = "disable";
-            //element.setAttribute("link-status", "disable");
-            webannotator.linksEnabled = false;
         }
-        // Disable -> Enable
         else {
-            for(i =0; i < links.length; i++) {
-                var element = links[i];
-                var attrs = element.attributes;
-                var attrName; var length = attrs.length;
-                for (var attr, j = 0 ; j < length; j++){
-                    var toRemove = [];
-                    var toPush = {};
-                    attr = attrs.item(j);
-                    attrName = attr.nodeName;
-                    if (attrName.substring(0, wa_prefix.length).toLowerCase() === wa_prefix.toLowerCase()) {
-                        toRemove.push(attrName);
-                        toPush[attrName.substring(wa_prefix.length, attrName.length)] = element.getAttribute(attrName);
-                   }
-                }
-                for (var elem in toRemove) {
-                    element.removeAttribute(toRemove[elem]);
-                }
-                for (var elem in toPush) {
-                    element.setAttribute(elem, toPush[elem]);
-                }
-
-
-                // var element = links[i];
-                // var attrs = element.attributes;
-                // for(var key in attrs) {
-                // 	if (key.indexOf(wa_prefix, 0) == 0) {
-                // 		element.setAttribute(key.substring(length(wa_prefix), key), element.getAttribute(key));
-                // 		element.removeAttribute(key);
-                // 	}
-                // }
-            }
+            // Disable -> Enable
+            webannotator.htmlWA.enableLinksAndEvents(doc);
             _status = "enable";
-            //element.setAttribute("link-status", "enable");
-            webannotator.linksEnabled = true;
         }
+
         if (!isClone) {
             webannotator.main.receiveSwitchLinks(_status);
         }
     },
 
+    disableLinksAndEvents: function(doc){
+        var elems = doc.getElementsByTagName("*");
+        var waPrefix = webannotator.htmlWA.waPrefix;
+        for (var i = 0; i < elems.length; i++) {
+            var toRemove = [];
+            var toPush = {};
+            var element = elems[i];
+            var attrs = element.attributes;
+            for (var attr, j = 0 ; j < attrs.length; j++){
+                attr = attrs.item(j);
+                var attrName = attr.nodeName.toLowerCase();
+                if ((element.nodeName.toLowerCase() === "a" && attrName.toLowerCase() === "href") || (attrName.startsWith("on")) || (attrName.startsWith("ajaxify"))) {
+                    toRemove.push(attrName);
+                    toPush[waPrefix + attrName] = element.getAttribute(attrName);
+                }
+            }
+            webannotator.htmlWA.replaceAttributes(element, toRemove, toPush);
+        }
+        //element.setAttribute("link-status", "disable");
+        webannotator.linksEnabled = false;
+    },
 
-    // /**
-    //  * Enable/Disable links on the current page
-    //  */
-    // receiveWindowSwitchLinks: function (doc, isClone, value) {
-    // 	if (doc == null) {
-    // 		doc = content.document;
-    // 	}
-    // 	var links = doc.getElementsByTagName("a");
-    // 	var i;
-    // 	// If an argument is defined
-    // 	if (value !== null) {
-    // 		// if activation is asked and already activated
-    // 		// or deactivation is asked and already deactivated
-    // 		// do nothing
-    // 		if (value == webannotator.linksEnable) {
-    // 			return;
-    // 		}
-    // 		// else switch !
-    // 	}
-    // 	// Enable -> Disable
-    // 	var _status;
-    // 	if (webannotator.linksEnable) {
-    // 		for(i =0; i < links.length; i++) {
-    // 			if (links[i].getAttribute("hrefTemp") == null) {
-    // 				var att=links[i].getAttribute("href");
-    // 				if (att !== null) {
-    // 					links[i].removeAttribute("href");
-    // 					links[i].setAttribute("hrefTemp",att);
-    // 				}
-    // 			}
-    // 		}
-    // 		_status = "disable";
-    // 		//element.setAttribute("link-status", "disable");
-    // 		webannotator.linksEnable = false;
-    // 	}
-    // 	// Disable -> Enable
-    // 	else {
-    // 		for(i =0; i < links.length; i++) {
-    // 			att=links[i].getAttribute("hrefTemp");
-    // 			if (att !== null) {
-    // 				links[i].removeAttribute("hrefTemp");
-    // 				links[i].setAttribute("href",att);
-    // 			}
-    // 		}
-    // 		_status = "enable";
-    // 		//element.setAttribute("link-status", "enable");
-    // 		webannotator.linksEnable = true;
-    // 	}
-    // 	if (!isClone) {
-    // 		webannotator.main.receiveSwitchLinks(_status);
-    // 	}
-    // },
+    enableLinksAndEvents: function(doc){
+        var elems = doc.getElementsByTagName("*");
+        var waPrefix = webannotator.htmlWA.waPrefix;
+        for (var i = 0; i < elems.length; i++) {
+            var toRemove = [];
+            var toPush = {};
+            var element = elems[i];
+            var attrs = element.attributes;
+            for (var attr, j = 0 ; j < attrs.length; j++){
+                attr = attrs.item(j);
+                var attrName = attr.nodeName.toLowerCase();
+                if (attrName.substring(0, waPrefix.length).toLowerCase() === waPrefix.toLowerCase()) {
+                    toRemove.push(attrName);
+                    toPush[attrName.substring(waPrefix.length, attrName.length)] = element.getAttribute(attrName);
+               }
+            }
+            webannotator.htmlWA.replaceAttributes(element, toRemove, toPush);
+        }
+        //element.setAttribute("link-status", "enable");
+        webannotator.linksEnabled = true;
+    },
+
+    replaceAttributes: function(element, toRemove, toPush){
+        for (var i=0; i < toRemove.length; i++) {
+            element.removeAttribute(toRemove[i]);
+        }
+        for (var attrName in toPush) {
+            element.setAttribute(attrName, toPush[attrName]);
+        }
+    },
 
     /**
      * Move annotation popups position
