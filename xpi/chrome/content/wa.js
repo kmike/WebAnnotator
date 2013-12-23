@@ -575,7 +575,7 @@ webannotator.main = {
         webannotator.titleAnnotation.deactivateToolbarButton();
 
         window.content.location.reload();
-        webannotator.linksEnable = true;
+        webannotator.linksEnabled = true;
         // remove all event listeners
         webannotator.main.setModified(false);
         var container = gBrowser.tabContainer;

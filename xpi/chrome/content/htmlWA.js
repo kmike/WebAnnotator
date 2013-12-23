@@ -39,7 +39,7 @@ webannotator.noLoad = true;
 // WA annotation identifier to edit, if edit asked
 webannotator.id_to_edit = null;
 // Are the links activated or not in the page?
-webannotator.linksEnable = true;
+webannotator.linksEnabled = true;
 // Event for showing or editing annotations
 webannotator.showEditEvent = null;
 
@@ -488,14 +488,14 @@ webannotator.htmlWA = {
             // if activation is asked and already activated
             // or deactivation is asked and already deactivated
             // do nothing
-            if (value == webannotator.linksEnable) {
+            if (value == webannotator.linksEnabled) {
                 return;
             }
             // else switch !
         }
         // Enable -> Disable
         var _status;
-        if (webannotator.linksEnable) {
+        if (webannotator.linksEnabled) {
             for(i = 0; i < links.length; i++) {
                 var toRemove = [];
                 var toPush = {};
@@ -519,7 +519,7 @@ webannotator.htmlWA = {
             }
             _status = "disable";
             //element.setAttribute("link-status", "disable");
-            webannotator.linksEnable = false;
+            webannotator.linksEnabled = false;
         }
         // Disable -> Enable
         else {
@@ -556,7 +556,7 @@ webannotator.htmlWA = {
             }
             _status = "enable";
             //element.setAttribute("link-status", "enable");
-            webannotator.linksEnable = true;
+            webannotator.linksEnabled = true;
         }
         if (!isClone) {
             webannotator.main.receiveSwitchLinks(_status);
