@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <script>
+        function onClickHandler() {
+            alert("clicked");
+        }
+
+        window.addEventListener('load', function(){
+            var els = document.getElementsByClassName('onclick-link-closure');
+            for (var i=0; i<els.length; i++){
+                els[i].addEventListener("click", function(){
+                    alert("clicked");
+                });
+            }
+
+            var els2 = document.getElementsByClassName('onclick-link-named');
+            for (i=0; i<els2.length; i++){
+                els2[i].addEventListener("click", onClickHandler);
+            }
+        })
+    </script>
+
+    <style>
+        div {
+            margin-left: 1em;
+            margin-bottom: 1em;
+        }
+    </style>
+</head>
+<body>
+    <h1>The following elements should all do nothing when WebAnnotator is enabled:</h1>
+    <div id="ex1">
+        <a href="https://github.com/xtannier/WebAnnotator">a with href</a>
+    </div>
+
+    <div id="ex2">
+        <a href="https://github.com/xtannier/WebAnnotator" onclick="location.href='https://github.com/xtannier/WebAnnotator'">a with both href and onclick</a>
+    </div>
+
+    <div id="ex3">
+        <a onclick="document.location.href='https://github.com/xtannier/WebAnnotator'">a with onClick handler</a>
+    </div>
+
+    <div id="ex4">
+        <a class="onclick-link-closure">a with dynamic onClick handler</a>
+    </div>
+
+    <div id="ex5" class="onclick-link-closure">
+        div with dynamic onClick handler
+    </div>
+
+    <div id="ex6" class="onclick-link-named">
+        div with dynamic, named onClick handler
+    </div>
+
+</body>
+</html>
